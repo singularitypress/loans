@@ -1,5 +1,7 @@
 # Loan Calculator – Next.js + TypeScript
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/singularitypress/loans)
+
 This project is a simple **Loan Calculator** built with **Next.js**, **TypeScript**, and **Tailwind CSS**.  
 It demonstrates how to:
 
