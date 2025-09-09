@@ -1,8 +1,8 @@
-import { Input, Select } from "@/components/forms";
-import { Button } from "@/components/ui";
+import { DateRangePicker, Input, Select } from "@/components/forms";
+import { Button, Currency } from "@/components/ui";
 import { amortization, Payment } from "@/util";
 import Head from "next/head";
-import { useReducer, useState } from "react";
+import { useMemo, useReducer, useState } from "react";
 
 const OPTIONS = [
   { value: "monthly", label: "Monthly" },
@@ -52,6 +52,16 @@ export default function Home() {
   };
 
   const [state, dispatch] = useReducer(formReducer, INITIAL_STATE);
+
+  const { totalInterest, totalPrincipal } = useMemo(() => {
+    return payments.reduce(
+      (acc, curr) => ({
+        totalInterest: acc.totalInterest + curr.interestPaid,
+        totalPrincipal: acc.totalPrincipal + curr.principalPaid,
+      }),
+      { totalInterest: 0, totalPrincipal: 0 }
+    );
+  }, [payments]);
 
   return (
     <>
@@ -111,12 +121,15 @@ export default function Home() {
                   }
                   options={OPTIONS}
                 />
+                <DateRangePicker startDate="2025-02-01" endDate="2025-02-15" onChange={() => {}} />
                 <div className="mt-4 text-sm text-gray-600">
                   <ul className="grid grid-cols-2">
                     <div>
                       <li className="grid grid-cols-2">
                         <strong>Principle:</strong>{" "}
-                        <span>{state.principle}</span>
+                        <span>
+                          <Currency amount={state.principle} />
+                        </span>
                       </li>
                       <li className="grid grid-cols-2">
                         <strong>Interest:</strong>{" "}
@@ -132,19 +145,16 @@ export default function Home() {
                     </div>
                     <div>
                       <li className="grid grid-cols-2">
-                        <strong>Principle:</strong>{" "}
-                        <span>{state.principle}</span>
+                        <strong>Total Principle:</strong>{" "}
+                        <span>
+                          <Currency amount={totalPrincipal} />
+                        </span>
                       </li>
                       <li className="grid grid-cols-2">
                         <strong>Interest:</strong>{" "}
-                        <span>{state.interest}%</span>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <strong>Term:</strong> <span>{state.term} years</span>
-                      </li>
-                      <li className="grid grid-cols-2">
-                        <strong>Frequency:</strong>{" "}
-                        <span>{state.frequency}</span>
+                        <span>
+                          <Currency amount={totalInterest} />
+                        </span>
                       </li>
                     </div>
                   </ul>
@@ -186,16 +196,16 @@ export default function Home() {
                           {payment.paymentNumber}
                         </td>
                         <td className="py-2 px-4 text-right">
-                          ${payment.paymentAmount.toFixed(2)}
+                          <Currency amount={payment.paymentAmount} />
                         </td>
                         <td className="py-2 px-4 text-right">
-                          ${payment.interestPaid.toFixed(2)}
+                          <Currency amount={payment.interestPaid} />
                         </td>
                         <td className="py-2 px-4 text-right">
-                          ${payment.principalPaid.toFixed(2)}
+                          <Currency amount={payment.principalPaid} />
                         </td>
                         <td className="py-2 px-4 text-right">
-                          ${payment.remainingBalance.toFixed(2)}
+                          <Currency amount={payment.remainingBalance} />
                         </td>
                       </tr>
                     ))}
